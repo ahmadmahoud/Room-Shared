@@ -63,14 +63,15 @@ public class MainActivity extends AppCompatActivity {
         postsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         postsRecyclerView.setAdapter(adapter);
 
-        NoteDatabase noteDatabase = NoteDatabase.getInstance(this);
+        database = NoteDatabase.getInstance(this);
+        entities = database.noteDAO().getnote();
 
 //new NoteEntity(noteTitle.getEditableText().toString(),bodyEt.getEditableText().toString())
 
         insertBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                noteDatabase.noteDAO().insertNote(new NoteEntity(Objects.requireNonNull(noteTitle.getEditableText()).toString(), bodyEt.getEditableText().toString()))
+                database.noteDAO().insertNote(new NoteEntity(Objects.requireNonNull(noteTitle.getEditableText()).toString(), bodyEt.getEditableText().toString()))
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new CompletableObserver() {
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         getBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                noteDatabase.noteDAO().getnote()
+                database.noteDAO().getnote()
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new SingleObserver<List<NoteEntity>>() {
@@ -121,18 +122,19 @@ public class MainActivity extends AppCompatActivity {
         deldata.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                noteDatabase.noteDAO().deleteallnote()
+                database.noteDAO().deleteallnote()
                         .subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new CompletableObserver() {
                             @Override
                             public void onSubscribe(@NonNull Disposable d) {
-                                adapter.notifyDataSetChanged();
+
                             }
 
                             @Override
                             public void onComplete() {
-
+                                adapter.notifyItemRemoved();
+                                adapter.notifyDataSetChanged();
                             }
 
                             @Override

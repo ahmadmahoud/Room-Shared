@@ -29,7 +29,7 @@ public interface NoteDAO {
 
     //delete all query
     @Delete
-    void del(List<NoteEntity> noteEntities);
+    Completable del(List<NoteEntity> noteEntities);
 
     //update
     @Query("UPDATE NoteTable SET name = :sname , content = :scontent WHERE id =:sid ")

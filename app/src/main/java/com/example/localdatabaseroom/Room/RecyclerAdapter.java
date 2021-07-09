@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.localdatabaseroom.R;
 
+import java.util.Collection;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -45,8 +46,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PostsV
     public void onBindViewHolder(@NonNull PostsViewHolder holder, int position) {
         holder.titleTV.setText(postsList.get(position).getName());
         holder.bodyTV.setText(postsList.get(position).getContent());
+        noteDatabase = NoteDatabase.getInstance(context);
+        NoteEntity entity = postsList.get(position);
 
+        // تعديل على عنصر في note
         holder.image_edit.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 NoteEntity entity = postsList.get(holder.getAdapterPosition());
@@ -89,27 +94,25 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PostsV
                             }
                         });
                         postsList.clear();
-//                        postsList.addAll();
                         notifyDataSetChanged();
                     }
                 });
             }
         });
 
-//        holder.image_delete.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                NoteEntity entity = postsList.get(holder.getAdapterPosition());
-//
-//                //
-//                noteDatabase.noteDAO().del(postsList);
-//                int position = holder.getAdapterPosition();
-//                postsList.remove(position);
-//                notifyItemChanged(position);
-//                notifyItemRangeChanged(position,postsList.size());
-//
-//            }
-//        });
+        // حذف عنصر من note
+        holder.image_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NoteEntity entity = postsList.get(holder.getAdapterPosition());
+                noteDatabase.noteDAO().deletenote(entity);
+                int position = holder.getAdapterPosition();
+                postsList.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position,postsList.size());
+
+            }
+        });
 
     }
 
@@ -119,10 +122,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PostsV
         notifyDataSetChanged();
     }
 
-//    public void setPostsList(List<NoteEntity> postsList) {
-//        this.postsList = postsList;
-//        notifyDataSetChanged();
-//    }
 
 
     public class PostsViewHolder extends RecyclerView.ViewHolder {
