@@ -85,7 +85,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PostsV
 
                             @Override
                             public void onComplete() {
-                                notifyDataSetChanged();
                             }
 
                             @Override
@@ -109,7 +108,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PostsV
                 int position = holder.getAdapterPosition();
                 postsList.remove(position);
                 notifyItemRemoved(position);
-                notifyItemRangeChanged(position,postsList.size());
+                notifyItemRangeChanged(position, postsList.size());
 
             }
         });
@@ -122,6 +121,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PostsV
         notifyDataSetChanged();
     }
 
+    public void delete(List<NoteEntity> delete) {
+        this.postsList = delete;
+        delete.clear();
+        notifyDataSetChanged();
+
+    }
 
 
     public class PostsViewHolder extends RecyclerView.ViewHolder {

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.localdatabaseroom.Room.NoteDatabase;
 import com.example.localdatabaseroom.Room.NoteEntity;
@@ -31,16 +32,16 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView postsRecyclerView;
     private List<NoteEntity> entities = new ArrayList<>();
-    private  NoteDatabase database;
+    private NoteDatabase database;
     private Button insertBtn, getBtn, deldata;
     private EditText noteTitle, bodyEt;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+
+
         room_with_rx();
 
     }
@@ -54,17 +55,37 @@ public class MainActivity extends AppCompatActivity {
 
         insertBtn = findViewById(R.id.insertButton);
         getBtn = findViewById(R.id.getButton);
-        deldata =findViewById(R.id.delButton);
+        deldata = findViewById(R.id.delButton);
         noteTitle = findViewById(R.id.editTexttitle);
         bodyEt = findViewById(R.id.editTextBody);
 
         postsRecyclerView = findViewById(R.id.posts_recyclerView);
-        RecyclerAdapter adapter = new RecyclerAdapter(entities,MainActivity.this);
+        RecyclerAdapter adapter = new RecyclerAdapter(entities, MainActivity.this);
         postsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         postsRecyclerView.setAdapter(adapter);
 
         database = NoteDatabase.getInstance(this);
-        entities = database.noteDAO().getnote();
+//        database.noteDAO().getnote()
+//                .subscribeOn(Schedulers.computation())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new SingleObserver<List<NoteEntity>>() {
+//                    @Override
+//                    public void onSubscribe(@NonNull Disposable d) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onSuccess(@NonNull List<NoteEntity> noteEntities) {
+//                        adapter.setPostsList(noteEntities);
+//                        adapter.notifyDataSetChanged();
+//                    }
+//
+//                    @Override
+//                    public void onError(@NonNull Throwable e) {
+//
+//                    }
+//                });
+
 
 //new NoteEntity(noteTitle.getEditableText().toString(),bodyEt.getEditableText().toString())
 
@@ -87,34 +108,16 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onError(Throwable e) {
 
-                            } });
-            }});
+                            }
+                        });
+            }
+        });
 
 
         getBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                database.noteDAO().getnote()
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new SingleObserver<List<NoteEntity>>() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
-
-                            }
-
-                            @Override
-                            public void onSuccess(List<NoteEntity> posts) {
-                                adapter.setPostsList(posts);
-                                adapter.notifyDataSetChanged();
-                                Log.i(TAG, "onSuccess: "+posts);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-
-                            }
-                        });
+               getdata(adapter);
             }
         });
 
@@ -133,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onComplete() {
-                                adapter.notifyItemRemoved();
+                                adapter.delete(entities);
                                 adapter.notifyDataSetChanged();
                             }
 
@@ -146,9 +149,34 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
 
+    private void getdata(RecyclerAdapter adapter) {
+        database.noteDAO().getnote()
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<List<NoteEntity>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(List<NoteEntity> posts) {
+                        adapter.setPostsList(posts);
+                        adapter.notifyDataSetChanged();
+                        Log.i(TAG, "onSuccess: " + posts);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
+    }
 }
-}
+
+
 
 
 
