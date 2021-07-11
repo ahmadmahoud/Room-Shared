@@ -5,16 +5,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.example.localdatabaseroom.Room.NoteDatabase;
 import com.example.localdatabaseroom.Room.NoteEntity;
 import com.example.localdatabaseroom.Room.RecyclerAdapter;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private RecyclerView postsRecyclerView;
-    private List<NoteEntity> entities = new ArrayList<>();
+    private List<NoteEntity> entities;
     private NoteDatabase database;
     private Button insertBtn, getBtn, deldata;
     private EditText noteTitle, bodyEt;
@@ -53,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         // DAO Data access ( interface ).
         // Database ( Abstract Class ).
 
+        entities = new ArrayList<>();
         insertBtn = findViewById(R.id.insertButton);
         getBtn = findViewById(R.id.getButton);
         deldata = findViewById(R.id.delButton);
@@ -65,26 +63,6 @@ public class MainActivity extends AppCompatActivity {
         postsRecyclerView.setAdapter(adapter);
 
         database = NoteDatabase.getInstance(this);
-//        database.noteDAO().getnote()
-//                .subscribeOn(Schedulers.computation())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new SingleObserver<List<NoteEntity>>() {
-//                    @Override
-//                    public void onSubscribe(@NonNull Disposable d) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(@NonNull List<NoteEntity> noteEntities) {
-//                        adapter.setPostsList(noteEntities);
-//                        adapter.notifyDataSetChanged();
-//                    }
-//
-//                    @Override
-//                    public void onError(@NonNull Throwable e) {
-//
-//                    }
-//                });
 
 
 //new NoteEntity(noteTitle.getEditableText().toString(),bodyEt.getEditableText().toString())
@@ -98,16 +76,17 @@ public class MainActivity extends AppCompatActivity {
                         .subscribe(new CompletableObserver() {
                             @Override
                             public void onSubscribe(Disposable d) {
-
                             }
 
                             @Override
                             public void onComplete() {
+                                getdata(adapter);
+                                adapter.notifyDataSetChanged();
+
                             }
 
                             @Override
                             public void onError(Throwable e) {
-
                             }
                         });
             }
@@ -117,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         getBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               getdata(adapter);
+                getdata(adapter);
             }
         });
 
@@ -150,35 +129,29 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
     private void getdata(RecyclerAdapter adapter) {
-        database.noteDAO().getnote()
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleObserver<List<NoteEntity>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
+            database.noteDAO().getnote()
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SingleObserver<List<NoteEntity>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
 
-                    }
+                        }
 
-                    @Override
-                    public void onSuccess(List<NoteEntity> posts) {
-                        adapter.setPostsList(posts);
-                        adapter.notifyDataSetChanged();
-                        Log.i(TAG, "onSuccess: " + posts);
-                    }
+                        @Override
+                        public void onSuccess(List<NoteEntity> posts) {
+                            adapter.setPostsList(posts);
+                            adapter.notifyDataSetChanged();
+                        }
 
-                    @Override
-                    public void onError(Throwable e) {
+                        @Override
+                        public void onError(Throwable e) {
 
-                    }
-                });
+                        }
+                    });
     }
 }
-
-
-
-
 
 
 

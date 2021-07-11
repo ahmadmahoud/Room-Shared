@@ -47,14 +47,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.PostsV
         holder.titleTV.setText(postsList.get(position).getName());
         holder.bodyTV.setText(postsList.get(position).getContent());
         noteDatabase = NoteDatabase.getInstance(context);
-        NoteEntity entity = postsList.get(position);
+        NoteEntity entity = postsList.get(holder.getAdapterPosition());
 
         // تعديل على عنصر في note
         holder.image_edit.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                NoteEntity entity = postsList.get(holder.getAdapterPosition());
                 int sid = entity.getId();
                 String sname = entity.getName();
                 String scontent = entity.getContent();
